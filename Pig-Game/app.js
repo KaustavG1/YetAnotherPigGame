@@ -2,7 +2,7 @@
 GAME RULES:
 - The game has 2 players, playing in rounds
 - In each turn, a player rolls a dice as many times as he whishes. Each result get added to his ROUND score
-- BUT, if the player rolls a 1, all his ROUND score gets lost. After that, it's the next player's turn
+- BUT, if the player rolls a 1 or two 6 in a row, all his ROUND score gets lost. After that, it's the next player's turn
 - The player can choose to 'Hold', which means that his ROUND score gets added to his GLOBAL score. After that, it's the next player's turn
 - The first player to reach 100 points on GLOBAL score wins the game
 */
@@ -13,12 +13,12 @@ function gameRulez() {
     return `GAME RULES:
     - The game has 2 players, playing in rounds
     - In each turn, a player rolls a dice as many times as he whishes.Each result get added to his ROUND score
-    - BUT, if the player rolls a 1, all his ROUND score gets lost.After that, it's the next player's turn
+    - BUT, if the player rolls a 1 or two 6 in a row, all his ROUND score gets lost. After that, it's the next player's turn
     - The player can choose to 'Hold', which means that his ROUND score gets added to his GLOBAL score.After that, it's the next player's turn
     - The first player to reach 100 points on GLOBAL score wins the game`
 }
 
-let current, rand, playerScore, highScore, isPlaying;
+let current, rand, playerScore, highScore, isPlaying, previousRoll, currentRoll;
 
 /*
 Init Conditions:
@@ -37,8 +37,10 @@ function _inti_() {
     activePlayer = 0;
     current = 0;
     playerScore = [0, 0];
-    highScore = 10;
+    highScore = 100;
     isPlaying = true;
+    previousRoll = 0;
+    currentRoll = 0;
 }
 
 _inti_();
@@ -68,7 +70,13 @@ const rollDice = () => {
     if(isPlaying) {
         document.querySelector(`.player-${activePlayer}-panel`).classList.add('active');
         rand = Math.floor(Math.random() * 6) + 1;
-        (rand !== 1) ? ifNotOne() : ifOne();
+        currentRoll = rand;
+        if (currentRoll + previousRoll !== 12) {
+            (rand !== 1) ? ifNotOne() : ifOne();
+        }
+        else {
+            ifOne();
+        }
     }        
 }
 
@@ -77,6 +85,7 @@ const ifNotOne = () => {
     document.querySelector('.dice').style.display = 'block';
     current += rand;
     document.querySelector(`#current-${activePlayer}`).textContent = `${current}`
+    previousRoll = currentRoll;
 }
 
 const ifOne = () => {
@@ -97,14 +106,17 @@ const hold = () => {
     if(isPlaying) {
         document.querySelector('.dice').style.display = 'none';
         playerScore[activePlayer] += current;
+        document.querySelector(`#score-${activePlayer}`).textContent = `${playerScore[activePlayer]}`;
         current = 0;
+        currentRoll = 0;
+        previousRoll = 0;
         playerScore[activePlayer] >= highScore ? triggerWinner() : continueGame(); 
     }
 }
 
 const triggerWinner = () => {
     isPlaying = false;
-    document.getElementById(`name-${activePlayer}`).textContent = 'Winner';
+    document.getElementById(`name-${activePlayer}`).textContent = 'Winner!';
     document.querySelector(`.player-${activePlayer}-panel`).classList.toggle('active');
     document.querySelector(`.player-${activePlayer}-panel`).classList.add('winner');
 }
