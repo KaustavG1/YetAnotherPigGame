@@ -134,7 +134,7 @@ const hold = () => {
         currentRoll = 0;
         previousRoll = 0;
         let temp = parseInt(document.querySelector('.max-score').value);
-        maxScore = temp ? temp : 100;
+        maxScore = Number.isInteger(temp) ? temp : 100;
         playerScore[activePlayer] >= maxScore ? triggerWinner() : continueGame(); 
     }
 }
